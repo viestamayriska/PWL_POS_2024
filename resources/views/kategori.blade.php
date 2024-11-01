@@ -11,6 +11,7 @@
             <th>Kode Kategori</th>
             <th>Nama Kategori</th>
         </tr>
+        
         @foreach ($data as $d)
         <tr>
             <td>{{ $d->kategori_id }}</td>

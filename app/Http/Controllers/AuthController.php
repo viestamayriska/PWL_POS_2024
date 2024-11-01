@@ -2,15 +2,19 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\UserModel;
+use App\Models\LevelModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Hash;
+
 
 class AuthController extends Controller
 {
     public function login()
     {
-        // If already logged in, redirect to the home page
-        if (Auth::check()) {
+        if (Auth::check()) { // jika sudah login, maka redirect ke halaman home 
             return redirect('/');
         }
         return view('auth.login');
@@ -18,11 +22,9 @@ class AuthController extends Controller
 
     public function postlogin(Request $request)
     {
-        // Check if the request is from AJAX
         if ($request->ajax() || $request->wantsJson()) {
             $credentials = $request->only('username', 'password');
 
-            // Attempt to authenticate the user
             if (Auth::attempt($credentials)) {
                 return response()->json([
                     'status' => true,
@@ -42,9 +44,45 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
-        Auth::logout(); // Log the user out
-        $request->session()->invalidate(); // Invalidate the session
-        $request->session()->regenerateToken(); // Regenerate CSRF token
-        return redirect('login'); // Redirect to the login page
+        Auth::logout();
+
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+        return redirect('login');
+    }
+
+    public function register(Request $request)
+    {
+    
+        $validator = Validator::make($request->all(), [
+            'level_id' => 'required|integer|exists:m_level,level_id',
+            'username' => 'required|string|min:4|max:20|unique:m_user,username',
+            'nama' => 'required|string|max:255',
+            'password' => 'required|string|min:6|confirmed',
+        ]);
+
+        
+        if ($validator->fails()) {
+            return redirect()->back()
+                ->withErrors($validator)
+                ->withInput();
+        }
+
+        // Buat user baru
+        UserModel::create([
+            'level_id' => $request->level_id,
+            'username' => $request->username,
+            'nama' => $request->nama,
+            'password' => Hash::make($request->password),
+        ]);
+
+        // mengarahkan kembali ke kalaman login
+        return redirect()->route('login')->with('success', 'Registrasi berhasil! Silakan login dengan kredensial Anda.');
+    }
+
+    public function showRegisterForm()
+    {
+        $level = LevelModel::all();
+        return view('auth.regis', compact('level'));
     }
 }

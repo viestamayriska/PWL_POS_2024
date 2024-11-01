@@ -11,6 +11,7 @@
             <th>Kode Level</th>
             <th>Nama Level</th>
         </tr>
+        
         @foreach ($data as $d)
         <tr>
             <td>{{ $d->level_id }}</td>

@@ -1,10 +1,37 @@
 <?php
 
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\SupplierController;
+use App\Http\Controllers\BarangController;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\KategoriController;
+use App\Http\Controllers\LevelController;
 use App\Http\Controllers\WelcomeController;
 use Illuminate\Support\Facades\Route;
 
+Route::pattern('id', '[0-9]+'); // When there is a parameter (id), it must be a number
+
+Route::get('login', [AuthController::class, 'login'])->name('login');
+Route::post('login', [AuthController::class, 'postlogin']);
+Route::get('logout', [AuthController::class, 'logout'])->middleware('auth');
+
+Route::middleware(['auth'])->group(function() { 
+    // Insert all routes that require authentication here
+});
+
 Route::get('/', [WelcomeController::class, 'index']);
+
+
+// Artinya semua route di dalam group ini harus punya role ADM (Administrator)
+Route::middleware(['authorize:ADM'])->group(function() {
+    Route::get('/level', [LevelController::class, 'index']);
+    Route::post('/level/list', [LevelController::class, 'list']); // untuk list json datatables
+    Route::get('/level/create', [LevelController::class, 'create']);
+    Route::post('/level', [LevelController::class, 'store']);
+    Route::get('/level/{id}/edit', [LevelController::class, 'edit']); // untuk tampilkan form edit
+    Route::put('/level/{id}', [LevelController::class, 'update']); // untuk proses update data
+    Route::delete('/level/{id}', [LevelController::class, 'destroy']); // untuk proses hapus data
+});
 
 // Route group for user-related routes
 Route::group(['prefix' => 'user'], function () {

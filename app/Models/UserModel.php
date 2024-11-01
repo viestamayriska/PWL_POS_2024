@@ -9,6 +9,13 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class UserModel extends Authenticatable 
 {
+    public function getJWTIdentifier(){
+        return $this->getKey();
+    }
+
+    public function getJWTCustomClaims(){
+        return [];
+    }
 
     protected $table = 'm_user';
     protected $primaryKey = 'user_id';
@@ -18,22 +25,27 @@ class UserModel extends Authenticatable
     protected $casts = ['password' => 'hashed']; // Password akan di-hash secara otomatis
 
     // Relasi ke tabel level
-public function level(): BelongsTo
-{
-    return $this->belongsTo(LevelModel::class, 'level_id', 'level_id');
-}
+    public function level(): BelongsTo
+    {
+        return $this->belongsTo(LevelModel::class, 'level_id', 'level_id');
+    }
 
-// Mendapatkan nama role
-public function getRoleName(): string
-{
-    return $this->level->level_nama;
-}
+    // Mendapatkan role
+    public function getRoleName(): string
+    {
+        return $this->level->level_nama;
+    }    
+    
 
-// Cek apakah user memiliki role tertentu
-public function hasRole($role): bool
-{
-    return $this->level->level_kode == $role;
-}
+    // Cek user memiliki role
+    public function hasRole($role) : bool
+    {
+        return $this->level->level_kode == $role;
+    }
 
-   
+    // Mendapatkan kode role
+    public function getRole()
+    {
+        return $this->level->level_kode;
+    }
 }

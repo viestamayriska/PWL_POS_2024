@@ -78,4 +78,16 @@ Route::group(['prefix' => 'user'], function () {
     Route::delete('/{id}', [UserController::class, 'destroy']);
 });
 
+Route::get('/barang', [BarangController::class, 'index']);
+Route::post('/barang/list', [BarangController::class, 'list']);
+Route::get('/barang/create_ajax', [BarangController::class, 'create_ajax']); // AJAX form create
+Route::post('/barang_ajax', [BarangController::class, 'store_ajax']); // AJAX store
+Route::get('/barang/{id}/edit_ajax', [BarangController::class, 'edit_ajax']); // AJAX form edit
+Route::put('/barang/{id}/update_ajax', [BarangController::class, 'update_ajax']); // AJAX update
+Route::get('/barang/{id}/delete_ajax', [BarangController::class, 'confirm_ajax']); // AJAX form confirm
+Route::delete('/barang/{id}/delete_ajax', [BarangController::class, 'delete_ajax']); // AJAX delete
+Route::get('/barang/import', [BarangController::class, 'import']); // AJAX form upload Excel
+Route::post('/barang/import_ajax', [BarangController::class, 'import_ajax']); // AJAX import Excel
+Route::get('/barang/export_excel', [BarangController::class, 'export_excel']); // Export Excel
+
 

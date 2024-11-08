@@ -4,11 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Tymon\JWTAuth\Contracts\JWTSubject;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class UserModel extends Authenticatable implements JWTSubject
 {
+    // JWT methods
     public function getJWTIdentifier()
     {
         return $this->getKey();
@@ -19,37 +20,28 @@ class UserModel extends Authenticatable implements JWTSubject
         return [];
     }
 
+    // Model properties
     protected $table = 'm_user';
     protected $primaryKey = 'user_id';
+    protected $fillable = [
+        'username',
+        'nama',
+        'password',
+        'level_id',
+        'image' // tambahan
+    ];
 
-
-    protected $fillable = ['username', 'password', 'nama', 'level_id', 'profile_image', 'created_at', 'updated_at'];
-
-    protected $hidden = ['password']; // Tidak ditampilkan saat select
-    protected $casts = ['password' => 'hashed']; // Password akan di-hash secara otomatis
-
-    // Relasi ke tabel level
-    public function level(): BelongsTo
+    // Relationships
+    public function level()
     {
         return $this->belongsTo(LevelModel::class, 'level_id', 'level_id');
     }
 
-    // Mendapatkan role
-    public function getRoleName(): string
+    // Accessors & Mutators
+    protected function image(): Attribute
     {
-        return $this->level->level_nama;
-    }    
-    
-
-    // Cek user memiliki role
-    public function hasRole($role) : bool
-    {
-        return $this->level->level_kode == $role;
-    }
-
-    // Mendapatkan kode role
-    public function getRole()
-    {
-        return $this->level->level_kode;
+        return Attribute::make(
+            get: fn($image) => url('/storage/posts/' . $image),
+        );
     }
 }

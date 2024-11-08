@@ -16,7 +16,8 @@ class RegisterController extends Controller
             'username' => 'required',
             'nama' => 'required',
             'password' => 'required|min:5|confirmed',
-            'level_id' => 'required'
+            'level_id' => 'required',
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048'
         ]);
 
         // If validation fails
@@ -30,19 +31,21 @@ class RegisterController extends Controller
             'nama' => $request->nama,
             'password' => bcrypt($request->password),
             'level_id' => $request->level_id,
+            'image' => $request->image->hashName()
         ]);
 
-        // Return response JSON if user is created
+        // Return JSON response if user is created
         if ($user) {
             return response()->json([
                 'success' => true,
-                'user' => $user,
+                'user' => $user
             ], 201);
         }
 
-        // Return JSON if insert process failed
+        // Return JSON response if insert failed
         return response()->json([
             'success' => false,
+            'message' => 'User creation failed'
         ], 409);
     }
 }
